@@ -1,19 +1,18 @@
-package com.albanero.order.entity;
+package com.albanero.payment.entity;
 
-import jakarta.annotation.Generated;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "order_table")
 public class Order {
 
     @Id

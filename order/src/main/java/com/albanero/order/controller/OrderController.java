@@ -27,7 +27,9 @@ public class OrderController {
 
     @GetMapping("/order")
     public Order createOrder(@RequestBody Order order){
-        orderProducer.publishOrder(order);
-        return orderService.saveOrder(order);
+
+        Order order1 = orderService.saveOrder(order);
+        orderProducer.publishOrder(order1);
+        return order1;
     }
 }
