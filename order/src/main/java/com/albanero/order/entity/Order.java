@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -18,4 +19,8 @@ public class Order {
     @Id
     @GeneratedValue
     int id;
+    String userName;
+    List<Integer> products;
+    String paymentDetails;
+    String deliveryAddress;
 }
