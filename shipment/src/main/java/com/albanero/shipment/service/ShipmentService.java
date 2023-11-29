@@ -1,0 +1,60 @@
+package com.albanero.shipment.service;
+
+
+import com.albanero.shipment.entity.Order;
+import com.albanero.shipment.entity.Shipment;
+import com.albanero.shipment.producer.OrderProducer;
+import com.albanero.shipment.repository.ShipmentRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+public class ShipmentService {
+
+
+
+    private final static String ORDER_PLACED = "ORDER_PLACED";
+    private final static String ORDER_FAILED = "ORDER_FAILED";
+
+    private final static String SHIPMENT_STARED = "SHIPMENT_STARED";
+
+    private final static String SHIPMENT_HOLD = "SHIPMENT_HOLD";
+
+
+
+    OrderProducer orderProducer;
+
+    ShipmentRepository shipmentRepository;
+
+    public ShipmentService(OrderProducer orderProducer,ShipmentRepository shipmentRepository){
+        this.orderProducer = orderProducer;
+        this.shipmentRepository = shipmentRepository;
+    }
+
+
+    public void processShipment(Order order) {
+        Shipment shipment = new Shipment();
+        shipment.setOrderId(order.getId());
+
+        if(order.getOrderStatus().equals(ORDER_PLACED)){
+            order.setOrderStatus(SHIPMENT_STARED);
+            shipment.setShipmentStatus(true);
+        }
+        else{
+            shipment.setShipmentStatus(false);
+            order.setOrderStatus(SHIPMENT_HOLD);
+        }
+        orderProducer.publishOrder(order);
+        save(shipment);
+    }
+
+    public Shipment save(Shipment shipment){
+      return  shipmentRepository.save(shipment);
+    }
+
+
+    public Shipment getShipmentDetailsByOrderId(Integer orderId) {
+        return shipmentRepository.findByOrderId(orderId);
+    }
+}
