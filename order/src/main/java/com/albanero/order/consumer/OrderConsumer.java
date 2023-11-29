@@ -21,6 +21,11 @@ public class OrderConsumer {
 
     @KafkaListener(topics="${kafka.topic}",groupId = "${spring.kafka.consumer.group-id}")
     public void updateOrderStatus(String orderJson) {
+
+        if(orderJson.contains("\"eventType\":\"ORDER\"")){
+            return;
+        }
+
         // Process the received order event
         System.out.println("Received order from Kafka: " + orderJson);
 
