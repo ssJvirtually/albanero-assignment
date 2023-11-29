@@ -29,9 +29,7 @@ public class OrderConsumer {
     public void processOrders(String orderJson) {
 
 
-        if(orderJson.contains("PAYMENT")){
-            return;
-        }
+
         // Process the received order event
         System.out.println("Received order from Kafka: " + orderJson);
 
@@ -46,10 +44,12 @@ public class OrderConsumer {
             throw new RuntimeException(e);
         }
 
-        if(order != null) {
-            // handle the data
-            paymentService.ProcessPayment(order);
+        if(!order.getEventType().equals("ORDER")){
+            return;
         }
+
+        // handle the data
+        paymentService.ProcessPayment(order);
     }
 
 }
