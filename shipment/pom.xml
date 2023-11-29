@@ -67,6 +67,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>shipment-service</finalName>
 	</build>
 
 </project>
