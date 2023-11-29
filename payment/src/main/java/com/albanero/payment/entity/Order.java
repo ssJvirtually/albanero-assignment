@@ -22,5 +22,6 @@ public class Order {
     List<Integer> products;
     String paymentDetails;
     String deliveryAddress;
-    String eventType = "ORDER";
+    String orderStatus;
+    String eventType = "PAYMENT";
 }

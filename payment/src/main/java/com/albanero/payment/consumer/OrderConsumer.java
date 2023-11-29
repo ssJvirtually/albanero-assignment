@@ -27,14 +27,17 @@ public class OrderConsumer {
 
     @KafkaListener(topics="${kafka.topic}",groupId = "${spring.kafka.consumer.group-id}")
     public void processOrders(String orderJson) {
+
+
+        if(orderJson.contains("PAYMENT")){
+            return;
+        }
         // Process the received order event
         System.out.println("Received order from Kafka: " + orderJson);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        if(orderJson.contains("PAYMENT")){
-            return;
-        }
+
 
         Order order = null;
         try {

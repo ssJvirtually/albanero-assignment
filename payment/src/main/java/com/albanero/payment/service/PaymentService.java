@@ -2,6 +2,7 @@ package com.albanero.payment.service;
 
 import com.albanero.payment.entity.Order;
 import com.albanero.payment.entity.Payment;
+import com.albanero.payment.producer.OrderProducer;
 import com.albanero.payment.producer.PaymentProducer;
 import com.albanero.payment.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +13,21 @@ import java.util.Random;
 
 @Service
 public class PaymentService {
+    private final static String ORDER_PLACED = "ORDER_PLACED";
+    private final static String ORDER_FAILED = "ORDER_FAILED";
+
 
     PaymentProducer paymentProducer;
 
+    OrderProducer orderProducer;
     PaymentRepository paymentRepository;
 
     @Autowired
-    public PaymentService(PaymentProducer paymentProducer,PaymentRepository paymentRepository){
+    public PaymentService(PaymentProducer paymentProducer,PaymentRepository paymentRepository,OrderProducer orderProducer){
 
         this.paymentProducer = paymentProducer;
         this.paymentRepository = paymentRepository;
+        this.orderProducer = orderProducer;
     }
 
     public void ProcessPayment(Order order){
@@ -30,7 +36,16 @@ public class PaymentService {
         payment.setOrderId(order.getId());
         payment.setPaymentStatus(paymentStatus);
         savePayment(payment);
-        paymentProducer.publishPaymentStatusForOrder(payment);
+
+        if(paymentStatus){
+            order.setOrderStatus(ORDER_PLACED);
+        }
+        else{
+            order.setOrderStatus(ORDER_FAILED);
+        }
+
+        //paymentProducer.publishPaymentStatusForOrder(payment);
+        orderProducer.publishOrder(order);
     }
 
     public Payment savePayment(Payment payment){
