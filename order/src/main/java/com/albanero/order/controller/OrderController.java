@@ -28,6 +28,7 @@ public class OrderController {
     @GetMapping("/order")
     public Order createOrder(@RequestBody Order order){
 
+        order.setOrderStatus("Created");
         Order order1 = orderService.saveOrder(order);
         orderProducer.publishOrder(order1);
         return order1;

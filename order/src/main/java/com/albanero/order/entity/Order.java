@@ -23,5 +23,7 @@ public class Order {
     List<Integer> products;
     String paymentDetails;
     String deliveryAddress;
+    String orderStatus;
     String eventType = "ORDER";
+
 }
