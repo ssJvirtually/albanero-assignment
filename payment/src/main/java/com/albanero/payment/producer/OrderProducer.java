@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,7 @@ public class OrderProducer {
     @Value("${spring.kafka.producer.bootstrap-servers}")
     String kafkaBootstrapServers;
 
+    private Logger logger = LoggerFactory.getLogger(OrderProducer.class);
     public void publishOrder(Order order){
 
         order.setEventType("PAYMENT");
@@ -34,6 +37,9 @@ public class OrderProducer {
             String orderJson = convertOrderToJson(order);
             // Send the order to the Kafka topic
             producer.send(new ProducerRecord<>(topic, orderJson));
+
+            logger.info("payment event published : {}" , new ObjectMapper().writeValueAsString( order));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
