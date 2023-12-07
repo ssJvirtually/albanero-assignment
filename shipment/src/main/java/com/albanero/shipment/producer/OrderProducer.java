@@ -8,7 +8,9 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
@@ -23,26 +25,25 @@ public class OrderProducer {
     @Value("${spring.kafka.producer.bootstrap-servers}")
     String kafkaBootstrapServers;
 
-    private Logger logger = LoggerFactory.getLogger(OrderProducer.class);
+    @Autowired
+    KafkaTemplate<String, String> kafkaTemplate;
+
+    private final Logger logger = LoggerFactory.getLogger(OrderProducer.class);
     public void publishOrder(Order order){
 
-
-        Properties properties = new Properties();
-        properties.put("bootstrap.servers", kafkaBootstrapServers);
-        properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         order.setEventType("SHIPMENT");
-        try (Producer<String, String> producer = new KafkaProducer<>(properties)) {
             // Convert the Order object to a JSON string (you may use a library like Jackson or Gson)
             String orderJson = convertOrderToJson(order);
             // Send the order to the Kafka topic
-            producer.send(new ProducerRecord<>(topic, orderJson));
+            kafkaTemplate.send(new ProducerRecord<>(topic, orderJson));
 
+        try {
             logger.info("shipment event published : {}" , new ObjectMapper().writeValueAsString( order));
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
+
+
 
     }
 

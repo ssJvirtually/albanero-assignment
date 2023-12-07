@@ -14,8 +14,8 @@ public class ShipmentService {
 
 
 
-    private final static String ORDER_PLACED = "ORDER_PLACED";
-    private final static String ORDER_FAILED = "ORDER_FAILED";
+    private final static String PAYMENT_SUCCESS = "PAYMENT_SUCCESS";
+    private final static String PAYMENT_FAILED = "PAYMENT_FAILED";
 
     private final static String SHIPMENT_STARED = "SHIPMENT_STARED";
 
@@ -37,7 +37,7 @@ public class ShipmentService {
         Shipment shipment = new Shipment();
         shipment.setOrderId(order.getId());
 
-        if(order.getOrderStatus().equals(ORDER_PLACED)){
+        if(order.getOrderStatus().equals(PAYMENT_SUCCESS)){
             order.setOrderStatus(SHIPMENT_STARED);
             shipment.setShipmentStatus(true);
         }
