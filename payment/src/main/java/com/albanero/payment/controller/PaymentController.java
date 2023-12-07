@@ -17,8 +17,8 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @GetMapping("/orderId")
-    public Payment getPaymentDetailsByOrderId(@RequestParam("orderId") Integer orderId){
+    @GetMapping("/paymentStatus/{orderId}")
+    public Payment getPaymentDetailsByOrderId(@PathVariable ("orderId") Integer orderId){
      return paymentService.getPaymentDetailsByOrderId(orderId);
     }
 }

@@ -13,8 +13,8 @@ import java.util.Random;
 
 @Service
 public class PaymentService {
-    private final static String ORDER_PLACED = "ORDER_PLACED";
-    private final static String ORDER_FAILED = "ORDER_FAILED";
+    private final static String PAYMENT_SUCCESS = "PAYMENT_SUCCESS";
+    private final static String PAYMENT_FAILED = "PAYMENT_FAILED";
 
 
     PaymentProducer paymentProducer;
@@ -38,10 +38,10 @@ public class PaymentService {
         savePayment(payment);
 
         if(paymentStatus){
-            order.setOrderStatus(ORDER_PLACED);
+            order.setOrderStatus(PAYMENT_SUCCESS);
         }
         else{
-            order.setOrderStatus(ORDER_FAILED);
+            order.setOrderStatus(PAYMENT_FAILED);
         }
 
         //paymentProducer.publishPaymentStatusForOrder(payment);
@@ -55,7 +55,6 @@ public class PaymentService {
 
     public boolean dummyPaymentHandler(String payload){
         boolean status = new Random().nextBoolean();
-
         return status;
     }
 
