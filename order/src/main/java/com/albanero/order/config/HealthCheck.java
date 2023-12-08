@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -26,7 +27,7 @@ public class HealthCheck {
 
     @Scheduled(fixedRate = 60000) // Run every minute (in milliseconds)
     public void runHealthCheck() {
-        System.out.println("Running health check...");
+        log.info("Running health check");
 
         // Get the last 5 orders
         List<Order> lastFiveOrders = orderService.getLastFiveOrders();
@@ -35,16 +36,12 @@ public class HealthCheck {
         //System.out.println(lastFiveOrders);
 
         // Check order status and raise alert if ORDER_CREATED
-        if(lastFiveOrders.stream().filter(order -> order.getOrderStatus().equals("ORDER_CREATED")).count() >= 5){
-                log.info("Payment service is  down");
-                // Send notification logic can be added here
+        if(lastFiveOrders.stream().filter(order -> order.getUpdated() == null).count() == 5){
+                log.error("downstream service are  DOWN , kindly check logs for more information");
+                // Send notification/alert logic can be added here
         }
 
 
-        if(lastFiveOrders.stream().filter(order -> order.getOrderStatus().equals("PAYMENT_SUCCESS")).count() >= 5){
-                log.info("Shipment service is down");
-                // Send notification logic can be added here
-        }
         }
 }
 

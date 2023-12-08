@@ -14,6 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,12 +25,6 @@ import java.util.Map;
 @Table(name = "order_table")
 public class Order {
 
-
-//    static {
-//        ObjectMapper om = new ObjectMapper();
-//        om.registerModule(new JavaTimeModule());
-//    }
-
     @Id
     @GeneratedValue
     int id;
@@ -39,8 +34,16 @@ public class Order {
     String deliveryAddress;
     String orderStatus;
     String eventType = "ORDER";
-    @CreationTimestamp
-    private LocalDateTime createdOn;
-    @UpdateTimestamp
-    private LocalDateTime lastUpdatedOn;
+    private Date created;
+    private Date updated;
+
+    @PrePersist
+    protected void onCreate() {
+        created = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updated = new Date();
+    }
 }
