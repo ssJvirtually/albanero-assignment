@@ -1,0 +1,125 @@
+version: '3'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=false"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data:rw              # Persistence data
+    networks:
+      - elastic-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    ports:
+      - "5601:5601"
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+    restart: on-failure
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic-network
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.1
+    container_name: logstash
+    ports:
+      - "25826:25826"
+      - "5044:5044"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+      - ./logs/:/usr/share/albenero/logs
+    command: logstash -f /usr/share/logstash/pipeline/logstash.conf  
+    restart: on-failure
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic-network
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - elastic-network
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    networks:
+      - elastic-network
+  
+  order-service:
+    container_name: order-service
+    image: order-service  #image name
+    build:
+      context: .
+      dockerfile: ./order/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: "512M"  # Set the desired memory limit
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./logs/order-service:/app/logs"  # Mount a volume from host's ./logs to container's /app/logs  
+    depends_on:
+      - kafka
+    networks:
+      - elastic-network
+    
+  payment-service:
+    container_name: payment-service
+    image: payment-service  # Replace with your actual image name
+    build:
+      context: .
+      dockerfile: ./payment/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: "512M"  # Set the desired memory limit
+    ports:
+      - "9129:9129"
+    volumes:
+      - "./logs/payment-service:/app/logs"  # Mount a volume from host's ./logs to container's /app/logs    
+    depends_on:
+      - kafka
+    networks:
+      - elastic-network
+      
+  shipment-service:
+    container_name: shipment-service
+    image: shipment-service  # Replace with your actual image name
+    build:
+      context: .
+      dockerfile: ./shipment/Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: "512M"  # Set the desired memory limit
+    ports:
+      - "9130:9130"
+    volumes:
+      - "./logs/shipment-service:/app/logs"  # Mount a volume from host's ./logs to container's /app/logs
+    depends_on:
+      - kafka
+    networks:
+      - elastic-network  
+
+networks:
+  elastic-network:
+    driver: bridge
