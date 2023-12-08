@@ -7,8 +7,6 @@ import com.albanero.shipment.producer.OrderProducer;
 import com.albanero.shipment.repository.ShipmentRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class ShipmentService {
 
@@ -17,7 +15,7 @@ public class ShipmentService {
     private final static String PAYMENT_SUCCESS = "PAYMENT_SUCCESS";
     private final static String PAYMENT_FAILED = "PAYMENT_FAILED";
 
-    private final static String SHIPMENT_STARED = "SHIPMENT_STARED";
+    private final static String SHIPMENT_STARTED = "SHIPMENT_STARTED";
 
     private final static String SHIPMENT_HOLD = "SHIPMENT_HOLD";
 
@@ -38,7 +36,7 @@ public class ShipmentService {
         shipment.setOrderId(order.getId());
 
         if(order.getOrderStatus().equals(PAYMENT_SUCCESS)){
-            order.setOrderStatus(SHIPMENT_STARED);
+            order.setOrderStatus(SHIPMENT_STARTED);
             shipment.setShipmentStatus(true);
         }
         else{
